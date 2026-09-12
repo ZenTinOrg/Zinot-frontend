@@ -1,7 +1,7 @@
 .hero {
   position: relative;
-  padding: 10rem 0 14rem;
-  overflow: visible;
+  padding: clamp(5rem, 14vw, 10rem) 0 clamp(4rem, 12vw, 14rem);
+  overflow: hidden;
   text-align: center;
   min-height: 60vh;
 }
@@ -16,9 +16,9 @@
 
 .hero-title {
   font-family: 'Clash Display', 'Plus Jakarta Sans', system-ui, sans-serif;
-  font-size: 4.25rem;
+  font-size: clamp(2.25rem, 6vw, 4.25rem);
   font-weight: 700;
-  line-height: 1.02;
+  line-height: 1.05;
   margin-bottom: 0.5rem;
   letter-spacing: -0.02em;
   color: var(--text-light);
@@ -32,14 +32,16 @@
 }
 
 .hero-subtitle {
-  font-size: 1.125rem;
+  font-size: clamp(1rem, 2.4vw, 1.125rem);
   color: var(--text-muted);
   max-width: 720px;
   margin: 0 auto 2.25rem;
+  padding: 0 1rem;
 }
 
 .hero-cta {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
   align-items: center;
@@ -128,6 +130,11 @@
 .blob-2 { background: radial-gradient(circle at 70% 70%, rgba(6,182,212,0.18), transparent 30%); bottom: -220px; right: -140px; }
 
 @media (max-width: 768px) {
-  .hero-title { font-size: 2.25rem; }
-  .hero { padding: 6rem 0 8rem; }
+  .blob { width: 420px; height: 420px; filter: blur(90px); }
+}
+
+@media (max-width: 480px) {
+  .hero-cta { flex-direction: column; width: 100%; }
+  .hero-cta button { width: 100%; justify-content: center; }
+  .blob { width: 280px; height: 280px; filter: blur(70px); }
 }

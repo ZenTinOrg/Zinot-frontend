@@ -1,4 +1,5 @@
 
+import { ArrowUpRight } from 'lucide-react';
 import './Hero.css';
 
 function Hero() {
@@ -17,7 +18,9 @@ function Hero() {
         <div className="hero-cta">
           <button className="btn-primary">
             <span>Launch App</span>
-            <span className="btn-icon">↗</span>
+            <span className="btn-icon">
+              <ArrowUpRight size={18} strokeWidth={2.5} aria-hidden="true" />
+            </span>
           </button>
           <button className="btn-secondary">Read Documentation</button>
         </div>

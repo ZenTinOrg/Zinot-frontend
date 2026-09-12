@@ -15,7 +15,7 @@ module.exports = {
       { allowConstantExport: true },
     ],
     '@typescript-eslint/no-explicit-any': 'error',
-    '@typescript-eslint/explicit-function-return-types': [
+    '@typescript-eslint/explicit-function-return-type': [
       'warn',
       { allowExpressions: true },
     ],

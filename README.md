@@ -1,36 +1,31 @@
 # Zinot Frontend - Stellar Lending Interface
 
-Modern React application providing a seamless user interface for the Zinot lending protocol on Stellar.
+The frontend for Zinot, a lending and borrowing protocol on Stellar. We're building this in the open, piece by piece — this README tracks exactly where each piece stands, so contributors can see what's ready to build on and where to jump in.
 
-## 🌟 Overview
+## 🌟 Where things stand
 
-Zinot Frontend delivers an intuitive experience for users to:
+**🟢 Shipped** — the public landing page, live in `App.tsx`:
+- `Navbar`, `Hero`, `Features`
+- Ships today as a static page; copy and sample rates are placeholders until the data layer below is connected
 
-✅ **Supply Liquidity**
-- Deposit USDC or XLM to earn interest
-- Real-time APY display
-- Instant confirmation feedback
-- Transaction history tracking
+**🟡 Built and ready to integrate** — engineered, type-checked, and waiting to be wired into the app:
+- `MarketCard`, `MarketList`, `PositionCard` — the market/position display components
+- `useMarkets` / `usePositions` — data-fetching hooks for them
+- `ApiService` (`src/services/api.ts`) — a REST client already speaking the protocol's intended API shape (`/api/markets`, `/api/positions/:user`, `/api/prices/:asset`, `/api/stats/pool`)
+- `src/utils/validation.ts` — runtime validators for the data those endpoints return
 
-✅ **Borrow Assets**
-- Borrow against supplied collateral
-- Dynamic borrowing limits
-- Health factor monitoring
-- Liquidation risk alerts
+This is the foundation of the real product: the display layer and its data contract are done. What's left is connecting them — rendering these components in the app and pointing `VITE_API_URL` at a live backend (or a mocked one for local dev). **This is one of the best places for a new contributor to make an immediate, visible impact.**
 
-✅ **Manage Positions**
-- View all supplied and borrowed amounts
-- Monitor portfolio health
-- Track APY earnings
-- Manage multiple positions
+**🧭 On the roadmap** — designed below, open for contributors to pick up:
+- Routing and dedicated pages (Dashboard, Markets, Positions, Governance)
+- App-wide state management for wallet/session/portfolio data
+- Stellar wallet integration and Soroban contract calls (Freighter, Lobstr, and manual signing via Stellar Lab)
+- Supply/Borrow modals and the end-to-end transaction flow
+- An automated test suite
 
-✅ **Market Analytics**
-- Market overview dashboard
-- Utilization rate visualization
-- Historical APY charts
-- Risk metrics display
+## 🎯 Target Architecture
 
-## 🏗️ Architecture
+This is the full picture we're building toward — a reference for how the pieces above fit together as the roadmap items land.
 
 ### Component Structure
 
@@ -59,7 +54,7 @@ Zinot Frontend delivers an intuitive experience for users to:
 │  ┌──────────────────────────────┤
 │  │  State Management            │
 │  │  - Redux / Context API       │
-│  │  - Wallet State              │
+│  │  - Wallet State               │
 │  │  - User Positions            │
 │  └──────────────────────────────┘
 └─────────────────────────────────┘
@@ -79,100 +74,23 @@ Zinot Frontend delivers an intuitive experience for users to:
 └─────────────────────────────────┘
 ```
 
-## 🎯 Key Pages
+### Pages
 
-### Dashboard
-**Purpose**: Main landing page with protocol overview
+**Dashboard** — protocol overview: TVL/debt stats, top markets, user portfolio summary.
 
-Features:
-- Protocol TVL and debt statistics
-- Top performing markets
-- User's portfolio summary
-- Quick action buttons
+**Markets** — a sortable market table with a detail modal (Supply/Borrow/Analytics tabs). `MarketList`/`MarketCard` already implement the sortable list and card (see "Built and ready to integrate"); the detail modal and page routing are the open piece.
 
-```
-[Dashboard]
-  ├─ Protocol Stats Card
-  ├─ User Portfolio Card
-  ├─ Top Markets List
-  └─ Recent Transactions
-```
+**Positions** — supplied/borrowed lists with health factor and liquidation warnings. `PositionCard` is built; the dedicated page and routing are next.
 
-### Markets
-**Purpose**: Explore and compare all available markets
+**Governance** — proposals, voting, delegation. Planned once the core lending flow is live.
 
-Features:
-- Sortable market table (TVL, APY, utilization)
-- Market detail modal
-- Supply/Borrow buttons
-- Real-time price updates
-
-```
-[Markets]
-  ├─ Market Filters
-  │  ├─ Sort by TVL
-  │  ├─ Sort by APY
-  │  └─ Filter by Asset
-  ├─ Market Cards
-  │  ├─ Asset Name & Symbol
-  │  ├─ TVL & Debt
-  │  ├─ APY Rates
-  │  └─ Utilization Gauge
-  └─ Detail Modal
-     ├─ Supply Tab
-     ├─ Borrow Tab
-     └─ Analytics Tab
-```
-
-### Positions
-**Purpose**: Manage user's lending/borrowing positions
-
-Features:
-- All supplied positions
-- All borrowed positions
-- Health factor status
-- Liquidation warning
-- Repay/Withdraw buttons
-
-```
-[Positions]
-  ├─ Supplied Positions
-  │  ├─ Position Card
-  │  │  ├─ Asset & Amount
-  │  │  ├─ APY Earned
-  │  │  └─ Withdraw Button
-  │  └─ Total Supplied
-  ├─ Borrowed Positions
-  │  ├─ Position Card
-  │  │  ├─ Asset & Amount
-  │  │  ├─ APY Rate
-  │  │  └─ Repay Button
-  │  └─ Total Borrowed
-  └─ Health Status
-     ├─ Health Factor
-     ├─ Risk Level
-     └─ Liquidation Price
-```
-
-### Governance (Future)
-**Purpose**: Participate in protocol decisions
-
-Features:
-- View active proposals
-- Vote on parameter changes
-- Delegate voting power
-- Proposal history
-
-## 🔗 Stellar Integration
-
-### Wallet Connection
+### Stellar integration
 
 ```typescript
-// Stellar wallet integration
+// Target shape for the wallet/contract layer
 const walletProvider = new StellarWalletProvider();
 const publicKey = await walletProvider.connect();
 
-// Transaction signing with Soroban
 const transaction = await zinotContract.buildSupplyTx(
   asset: 'USDC',
   amount: 1000
@@ -181,108 +99,17 @@ const signedTx = await walletProvider.sign(transaction);
 const result = await network.submitTransaction(signedTx);
 ```
 
-### Supported Wallets
-- Stellar.js default (via horizon)
-- Lobstr (browser extension)
-- Freighter (browser extension)
-- Stellar Lab (manual signing)
+Wallets we're targeting: Stellar.js (via Horizon), Freighter, Lobstr, and Stellar Lab for manual signing.
 
-### Transaction Flow
+### API surface
 
-```
-User clicks "Supply"
-    ↓
-Open Supply Modal
-    ↓
-Input amount & confirm
-    ↓
-Connect Wallet (if needed)
-    ↓
-Build Soroban Contract Call
-    ↓
-Request Signature
-    ↓
-Submit to Stellar Network
-    ↓
-Wait for Finality (~5 seconds)
-    ↓
-Update UI with Result
-    ↓
-Fetch Updated Position
-    ↓
-Display Success Message
-```
+`ApiService` already implements this client-side contract — the next step is a backend that speaks it:
 
-## 🎨 UI Components
-
-### Market Card Component
-Displays key metrics for a single market:
-```
-┌──────────────────────────┐
-│ Asset Name (USDC)        │
-├──────────────────────────┤
-│ TVL: $5.2M               │
-│ APY: 4.5%  |  Borrow 6.2%│
-│ Utilization: ████░░ 75%  │
-├──────────────────────────┤
-│ [Supply] [Borrow]        │
-└──────────────────────────┘
-```
-
-### Position Card Component
-Displays user's position details:
-```
-┌──────────────────────────────┐
-│ Supplied XLM                 │
-├──────────────────────────────┤
-│ Amount: 1,500 XLM            │
-│ APY: 3.2%                    │
-│ Earnings: 12.5 XLM/month     │
-├──────────────────────────────┤
-│ [Withdraw]  [View Details]   │
-└──────────────────────────────┘
-```
-
-### Supply Modal Component
-```
-┌────────────────────────────────┐
-│ Supply Liquidity               │
-├────────────────────────────────┤
-│ Asset: [USDC ▼]                │
-│ Amount: [________________]      │
-│ Max: 5,000 USDC                │
-├────────────────────────────────┤
-│ Expected APY: 4.5%             │
-│ Gas Fee: ~0.01 XLM             │
-├────────────────────────────────┤
-│ [Cancel]  [Supply]             │
-└────────────────────────────────┘
-```
-
-## 🌐 API Integration
-
-### Fetch Market Data
 ```typescript
-const response = await fetch('/api/markets');
-const markets: Market[] = await response.json();
-```
-
-### Get User Positions
-```typescript
-const response = await fetch(`/api/positions/${publicKey}`);
-const positions: UserPosition[] = await response.json();
-```
-
-### Update Price Data
-```typescript
-const response = await fetch(`/api/prices/${asset}`);
-const price: AssetPrice = await response.json();
-```
-
-### Poll Statistics
-```typescript
-const response = await fetch('/api/stats/pool');
-const stats: PoolStats = await response.json();
+ApiService.getMarkets();              // GET /api/markets
+ApiService.getPositions(publicKey);   // GET /api/positions/:user
+ApiService.getPrice(asset);           // GET /api/prices/:asset
+ApiService.getPoolStats();            // GET /api/stats/pool
 ```
 
 ## 🛠️ Development
@@ -290,7 +117,7 @@ const stats: PoolStats = await response.json();
 ### Prerequisites
 ```bash
 Node.js 18+
-npm or yarn
+npm
 ```
 
 ### Installation
@@ -301,9 +128,8 @@ npm install
 ### Environment Variables
 ```env
 VITE_API_URL=http://localhost:3001
-VITE_STELLAR_NETWORK=testnet
-VITE_CONTRACT_ID=your_contract_id
 ```
+`VITE_STELLAR_NETWORK` and `VITE_CONTRACT_ID` are reserved for the wallet integration milestone — nothing reads them yet.
 
 ### Development Server
 ```bash
@@ -315,99 +141,41 @@ npm run dev
 npm run build
 ```
 
+### Lint
+```bash
+npm run lint
+```
+
 ### Type Checking
 ```bash
 npm run type-check
 ```
 
-## 📱 Responsive Design
-
-- **Desktop**: Full feature set with multi-column layout
-- **Tablet**: Optimized column layout
-- **Mobile**: Single column with touch-friendly controls
-
-## ♿ Accessibility
-
-- WCAG 2.1 Level AA compliance
-- Semantic HTML structure
-- ARIA labels for screen readers
-- Keyboard navigation support
-- Color contrast ratios ≥ 4.5:1
-
-## 🔒 Security
-
-### Wallet Integration
-- Client-side signing only
-- No private keys stored
-- No seed phrases transmitted
-- Secure wallet provider APIs
-
-### Transaction Validation
-- Verify contract address before signing
-- Display transaction details for confirmation
-- Timeout long-running transactions
-- Alert on price slippage >1%
-
-### Data Security
-- HTTPS only
-- CSP headers enabled
-- XSS protection
-- CSRF tokens on forms
-
-## 📊 State Management
-
-### Global State (Redux/Context)
-```typescript
-{
-  wallet: {
-    connected: boolean;
-    publicKey: string;
-    balance: number;
-  };
-  markets: Market[];
-  positions: UserPosition[];
-  prices: { [asset: string]: number };
-  loading: boolean;
-  error: string | null;
-}
-```
-
-## 🚀 Performance
-
-### Optimization Strategies
-- Code splitting by route
-- Lazy load components
-- Memoize expensive computations
-- Debounce API calls
-- Image optimization
-
-### Metrics Target
-- FCP: <1s
-- LCP: <2.5s
-- CLS: <0.1
-- TTI: <3.5s
+A test suite (`npm test`) is on the roadmap and not set up yet — see Contributing below if you'd like to lead that.
 
 ## 📚 Feature Roadmap
 
-- [x] Market display
-- [x] Position viewing
+- [x] Market display component
+- [x] Position display component
+- [ ] Wire market/position components into the app against a live or mocked API
 - [ ] Supply functionality
 - [ ] Borrow functionality
+- [ ] Wallet integration
 - [ ] Liquidation notifications
 - [ ] Historical charts
-- [ ] Mobile app
 - [ ] Governance voting
 - [ ] Advanced analytics
+- [ ] Automated test suite
 
 ## 🤝 Contributing
 
-We need help with:
-- UI/UX improvements
+Good first areas to dig into:
+- Wire the existing market/position components into `App.tsx` against a live or mocked backend
+- Wallet integration
 - Component optimization
 - Mobile responsiveness
 - Accessibility enhancements
-- Testing coverage
-- Documentation
+- Standing up the test suite
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
@@ -417,9 +185,4 @@ MIT License - see LICENSE file
 
 ## 👤 Maintainer
 
-**m1s0g1** - Zinot Frontend Maintainer  
-Email: danielegbezien@gmail.com
-
----
-
-**Making Stellar Lending Simple. Intuitive. Fast.**
+**m1s0g1** - Zinot Frontend Maintainer

@@ -7,7 +7,7 @@ import { useMarkets } from '../../hooks/useMarkets';
 import { MarketCard } from '../MarketCard';
 import type { Market } from '../../types';
 
-interface MarketListProps {
+export interface MarketListProps {
   onSupply?: (market: Market) => void;
   onBorrow?: (market: Market) => void;
 }

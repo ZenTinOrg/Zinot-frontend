@@ -5,7 +5,7 @@
 import React from 'react';
 import type { Market } from '../../types';
 
-interface MarketCardProps {
+export interface MarketCardProps {
   market: Market;
   onSupply?: (market: Market) => void;
   onBorrow?: (market: Market) => void;

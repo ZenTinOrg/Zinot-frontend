@@ -5,7 +5,7 @@
 import React from 'react';
 import type { UserPosition } from '../../types';
 
-interface PositionCardProps {
+export interface PositionCardProps {
   position: UserPosition;
   onWithdraw?: (position: UserPosition) => void;
   onRepay?: (position: UserPosition) => void;
